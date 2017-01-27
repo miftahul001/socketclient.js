@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Socket Client Demo</title>
+<meta charset="utf-8" />
+<script src="sclient.js"></script>
+</head>
+<body>
+  <div>server : <input id="serv" type="text" value="localhost"></div>
+  <div>port : <input id="port" type="text" value="10000"></div>
+  <div><button id="conn" onclick="connect()">Connect</button></div>
+  <div style="margin-top:10px; margin-bottom:10px;"><div id="msg" style="height:300px; width:400px; overflow:auto; scroll:both; border:1px solid black;"></div><button onclick="clear()">Clear</button><br></div>
+  <div>msg : <input id="send" type="text">  <button onclick="send()">Send</button></div>
+<script>
+  var socketClient = null;
+  
+  function status(stat, msg) {
+    var ct = document.getElementById('msg');
+    if (stat=='Notification') { ct.innerHTML += '<p style="color:green;">[' + msg + ']</p>'; }
+    if (stat=='Error') { ct.innerHTML += '<p style="color:red;">[Error] ' + msg + '</p>'; }
+  }
+  
+  function received(msg) {
+    document.getElementById('msg').innerHTML += '<p>' + msg + '</p>';
+  }
+  
+  function connect() {
+    var btn = document.getElementById('conn');
+    if (btn.innerHTML == 'Connect') {
+      if (socketClient == null) {
+        socketClient = new _socketClient();
+        socketClient.onnotify = status;
+        socketClient.onmessage = received;
+      }
+      var server = document.getElementById('serv').value,
+      port = document.getElementById('port').value;
+      socketClient.connect(server, port, null, null);
+      btn.innerHTML = 'Disconnect';
+    }
+    else {
+      socketClient.disconnect();
+      btn.innerHTML = 'Connect';
+    }
+  }
+  
+  function send() {
+    if (socketClient != null) {
+      if (socketClient.isConnected()) {
+        var msg = document.getElementById('send').value;
+        socketClient.send(msg, msg.length);
+      }
+    }
+  }
+  
+  function clear() {
+    document.getElementById('msg').innerHTML = '';
+  }
+  
+</script>
+
+</body>
+</html>
